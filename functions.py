@@ -37,7 +37,7 @@ class PriceDc:
 class ValidatorDc:
     start: int = field(init=False)
     end: int = field(init=False)
-    earned_wei: int = field(init=False)
+    earned_qwei: int = field(init=False)
     earned_eth: float = field(init=False)
 
     validator: InitVar[ValidatorMixin] = None
@@ -45,8 +45,8 @@ class ValidatorDc:
     def __post_init__(self, validator):
         self.start = validator.start
         self.end = validator.end        
-        self.earned_wei = self.end - self.start if self.end else 0
-        self.earned_eth = self.earned_wei / 1000000000
+        self.earned_qwei = self.end - self.start if self.end else 0
+        self.earned_eth = self.earned_qwei / 1000000000
 
 
 @dataclass

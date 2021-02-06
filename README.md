@@ -5,7 +5,9 @@ This is a Python (3.7+) tool to help you keep track of how much Ether you earn v
 
 Installation
 ============
-Extract the files into their own folder and run eth2_daily_tracker.py from a CLI environment (Command Prompt or PowerShell in Windows or any Linux terminal) to see the modes of operation.
+ 
+
+Extract the files into their own folder and either install `sqlalchemy` and `requests` yourself or run `pip/pip3 install -r requirements txt`. Run eth2_daily_tracker.py from a CLI environment (Command Prompt or PowerShell in Windows or any Linux terminal) to see the modes of operation.
 
 Modes of operation
 ==================

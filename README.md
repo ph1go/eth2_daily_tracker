@@ -14,7 +14,9 @@ Modes of operation
 
 `eth2_daily_tracker.py update` or `eth2_daily_tracker.py u` - Update the saved data once and then exit. Use this mode if you want to run the script via crontab or a task scheduler.
 
-`eth2_daily_tracker.py show` or `eth2_daily_tracker.py s` - Generate a report to display the saved data. The default period is the last week but you can alter this with `--date-from`/`--date-to` (to go for a historical range) args or `--since` (the number of days ago you want to start the range from)
+`eth2_daily_tracker.py show` or `eth2_daily_tracker.py s` - Generate a report to display the saved data. The default period is the last week but you can alter this with `--date-from`/`--date-to` (to go for a historical range) args or `--since` (the number of days ago you want to start the range from).
+
+A log file, `updates.log`, is generated in the directory from which you are running the app - if you're running via crontab you can check this log file to make sure it's still updating.
 
 The config.ini file
 ===================

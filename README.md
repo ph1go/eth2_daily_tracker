@@ -7,7 +7,7 @@ Installation
 ============
  
 
-Extract the files into their own folder and either install `sqlalchemy` and `requests` yourself or run `pip/pip3 install -r requirements txt`. Run eth2_daily_tracker.py from a CLI environment (Command Prompt or PowerShell in Windows or any Linux terminal) to see the modes of operation.
+Extract the files into their own folder and either install `sqlalchemy` and `requests` yourself or run `pip/pip3 install -r requirements txt`. Run `python/python3 eth2_daily_tracker.py -h` from a CLI environment (Command Prompt or PowerShell in Windows or any Linux terminal) to see the modes of operation.
 
 Modes of operation
 ==================

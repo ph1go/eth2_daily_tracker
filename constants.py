@@ -8,7 +8,6 @@ source_path = Path(__file__).parent
 data_path = source_path / 'data'
 data_path.mkdir(exist_ok=True)
 config_file = source_path / 'config.ini'
-holdings_file = source_path / 'holdings.ini'
 log_file = source_path / 'updates.log'
 db_file = data_path / 'data.db'
 cmc_json_file = data_path / 'cmc_data.json'

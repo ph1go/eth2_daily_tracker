@@ -1,9 +1,9 @@
 import argparse
 import traceback
 import time
+from datetime import datetime, date, timedelta
 from db import Session
 from functions import check_date, update_price_and_balance_data, get_price_and_balance_date, get_forex_data
-from datetime import datetime, date, timedelta
 from constants import currency
 
 

@@ -26,3 +26,7 @@ This is generated when you first run the script. You need a CoinMarketCap API ke
 You also need to either know the index/es of your validator(s) or the eth1 address (0x...) of the wallet you used to send the deposits to create your validators.
 
 The default currency is USD (all ETH prices are saved in it in the database) but you can specify a different currency to display the ETH price and daily earnings in the config file or (more temporarily) by running the `show` mode with `-c/--currency` followed by the symbol (eg EUR) of your choice. This is a bit ropey as the datasource for these forex rates doesn't update them over the weekend (because *their* datasource doesn't update them over the weekend) so Sunday's rate will be the same as Friday's. It's enough for ball park figures.
+
+To do
+=====
+- Add detailed view (per validator earnings etc)

@@ -23,11 +23,8 @@ default period is the last week but you can alter this with `--date-from`/`--dat
 
 The config.ini file
 ===================
-This is generated when you first run the script. You need a CoinMarketCap API key. To obtain one, go to 
-https://pro.coinmarketcap.com/ and then paste it in when asked. 
+This is generated when you first run the script. You need a CoinMarketCap API key. To obtain one, go to https://pro.coinmarketcap.com/ and then paste it in when asked. 
 
-You also need to either know the indexes of your validator(s) or the eth1 address of the wallet you used
-to send the deposits to create your validators.
+You also need to either know the index/es of your validator(s) or the eth1 address (0x...) of the wallet you used to send the deposits to create your validators.
 
-The default currency is USD (all ETH prices are saved in it) but you can specify a different currency to
-display the ETH price and daily earnings in the config file or (more temporarily) by running the `show` mode with `-c/--currency` followed by the symbol (eg EUR) of your choice.
+The default currency is USD (all ETH prices are saved in it in the database) but you can specify a different currency to display the ETH price and daily earnings in the config file or (more temporarily) by running the `show` mode with `-c/--currency` followed by the symbol (eg EUR) of your choice.

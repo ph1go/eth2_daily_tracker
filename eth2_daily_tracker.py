@@ -158,7 +158,7 @@ if __name__ == '__main__':
         args.func(args)
 
     except AttributeError as e:
-        traceback.print_exc()
+        # traceback.print_exc()
         parser.print_help()
 
     finally:

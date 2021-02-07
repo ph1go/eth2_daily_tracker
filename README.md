@@ -29,4 +29,4 @@ The default currency is USD (all ETH prices are saved in it in the database) but
 
 To do
 =====
-- Add detailed view (per validator earnings etc)
+- Add support for exporting to CSV

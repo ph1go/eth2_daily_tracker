@@ -1,9 +1,11 @@
 import time
-from dataclasses import dataclass, field, InitVar
-from typing import Dict
 from datetime import datetime, date, timedelta
-from functions import update_price_and_balance_data, get_price_and_balance_date, check_date, get_forex_data
-from constants import currency, validator_indexes, num_pad
+from functions import (
+    update_price_and_balance_data, check_date, get_price_and_balance_date, get_forex_data,
+    DayData, print_detailed_day, print_non_detailed_day
+)
+
+from constants import currency, validator_indexes
 
 
 def mode_loop(args, session):
@@ -125,44 +127,3 @@ def mode_show(args, session):
     print(f' {len(title_str) * "="}\n {footer_str}')
 
     print()
-
-
-@dataclass
-class DayData:
-    eth_earned: float
-    fiat_price_of_1: float
-    fiat_price_of_earned: float = field(init=False)
-    eth_earned_str: str = field(init=False)
-    fiat_price_of_1_str: str = field(init=False)
-    fiat_price_of_earned_str: str = field(init=False)
-
-    fiat_currency: InitVar[str] = None
-    validators: Dict[str, 'DayData'] = field(default_factory=dict)
-
-    def __post_init__(self, fiat_currency: str):
-        self.fiat_price_of_earned = self.eth_earned * self.fiat_price_of_1
-        self.eth_earned_str = f'{self.eth_earned:.4f} ETH'
-        self.fiat_price_of_1_str = f'{self.fiat_price_of_1:,.2f} {fiat_currency}'
-        self.fiat_price_of_earned_str = f'{self.fiat_price_of_earned:,.2f} {fiat_currency}'
-
-
-def print_detailed_day(date_str, day_totals):
-    print(
-        f' {date_str}  total {day_totals.eth_earned_str:>{num_pad}}   {day_totals.fiat_price_of_1_str:>{num_pad}}  '
-        f'{day_totals.fiat_price_of_earned_str:>{num_pad}}'
-    )
-
-    for val_idx in day_totals.validators:
-        validator = day_totals.validators[val_idx]
-        print(
-            f' {" ":>10} {val_idx:>6} {validator.eth_earned_str:>{num_pad}}   '
-            f'{" ":>{num_pad}}  '
-            f'{validator.fiat_price_of_earned_str:>{num_pad}}'
-        )
-
-
-def print_non_detailed_day(date_str, day_totals):
-    print(
-        f' {date_str}  {day_totals.eth_earned_str:>{num_pad}}   {day_totals.fiat_price_of_1_str:>{num_pad}}  '
-        f'{day_totals.fiat_price_of_earned_str:>{num_pad}}'
-    )

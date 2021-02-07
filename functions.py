@@ -4,7 +4,7 @@ import requests
 from datetime import datetime, date, timedelta
 from dataclasses import dataclass, InitVar, field
 from typing import Dict
-from constants import cmc_json_file, bc_json_file, log_file, debug, cmc_headers, eth_price_to_use, validator_indexes
+from constants import eth_price_to_use, bc_json_file, cmc_json_file, log_file, num_pad, debug, cmc_headers, validator_indexes
 from db import Price, validators, ValidatorMixin
 
 
@@ -26,11 +26,13 @@ class PriceDc:
     @property
     def display(self):
         try:
-            return getattr(self, eth_price_to_use)
+            price_to_use = getattr(self, eth_price_to_use)
 
         except AttributeError:
             print(f' Invalid price type: "{eth_price_to_use}" - choose from "start", "end", "high" or "low"')
-            return self.high
+            price_to_use = self.low
+
+        return price_to_use
 
 
 @dataclass
@@ -44,7 +46,7 @@ class ValidatorDc:
 
     def __post_init__(self, validator):
         self.start = validator.start
-        self.end = validator.end        
+        self.end = validator.end
         self.earned_gwei = self.end - self.start if self.end else 0
         self.earned_eth = self.earned_gwei / 1000000000
 
@@ -54,6 +56,25 @@ class Day:
     date: date
     price: PriceDc
     validators: Dict[str, ValidatorDc] = field(init=False, default_factory=dict)
+
+
+@dataclass
+class DayData:
+    eth_earned: float
+    fiat_price_of_1: float
+    fiat_price_of_earned: float = field(init=False)
+    eth_earned_str: str = field(init=False)
+    fiat_price_of_1_str: str = field(init=False)
+    fiat_price_of_earned_str: str = field(init=False)
+
+    fiat_currency: InitVar[str] = None
+    validators: Dict[str, 'DayData'] = field(default_factory=dict)
+
+    def __post_init__(self, fiat_currency: str):
+        self.fiat_price_of_earned = self.eth_earned * self.fiat_price_of_1
+        self.eth_earned_str = f'{self.eth_earned:.4f} ETH'
+        self.fiat_price_of_1_str = f'{self.fiat_price_of_1:,.2f} {fiat_currency}'
+        self.fiat_price_of_earned_str = f'{self.fiat_price_of_earned:,.2f} {fiat_currency}'
 
 
 def update_price_and_balance_data(session, test=False, loop=False):
@@ -92,12 +113,12 @@ def update_price_and_balance_data(session, test=False, loop=False):
 
             today_balance = Validator(date=today, start=current_validator_balances[val_idx])
             session.add(today_balance)
-    
+
     log_str = (
         f'{datetime.now().strftime("%Y/%m/%d %H:%M")}  '
         f'Updated successfully (current ETH price: {current_eth_price:,.2f} USD)'
     )
-            
+
     with log_file.open('a') as f:
         f.write(f'{log_str}\n')
 
@@ -110,7 +131,7 @@ def update_price_and_balance_data(session, test=False, loop=False):
 def get_forex_data(date_range, currency):
     start_date = min(date_range)
     if start_date.weekday() > 4:
-        start_date = start_date - timedelta(days=start_date.weekday()-4)
+        start_date = start_date - timedelta(days=start_date.weekday() - 4)
 
     start_date = start_date.strftime('%Y-%m-%d')
     end_date = max(date_range).strftime('%Y-%m-%d')
@@ -222,3 +243,25 @@ def get_validator_balances(test=False):
     data = _ if isinstance(_, list) else [_]
 
     return {str(v['validatorindex']): v['balance'] for v in data}
+
+
+def print_detailed_day(date_str, day_totals):
+    print(
+        f' {date_str}  total {day_totals.eth_earned_str:>{num_pad}}   {day_totals.fiat_price_of_1_str:>{num_pad}}  '
+        f'{day_totals.fiat_price_of_earned_str:>{num_pad}}'
+    )
+
+    for val_idx in day_totals.validators:
+        validator = day_totals.validators[val_idx]
+        print(
+            f' {" ":>10} {val_idx:>6} {validator.eth_earned_str:>{num_pad}}   '
+            f'{" ":>{num_pad}}  '
+            f'{validator.fiat_price_of_earned_str:>{num_pad}}'
+        )
+
+
+def print_non_detailed_day(date_str, day_totals):
+    print(
+        f' {date_str}  {day_totals.eth_earned_str:>{num_pad}}   {day_totals.fiat_price_of_1_str:>{num_pad}}  '
+        f'{day_totals.fiat_price_of_earned_str:>{num_pad}}'
+    )

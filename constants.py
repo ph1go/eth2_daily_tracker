@@ -110,3 +110,4 @@ cmc_headers = {'Accepts': 'application/json', 'X-CMC_PRO_API_KEY': api_key}
 
 # choose between start, end, high or low
 eth_price_to_use = 'low'
+num_pad = 12

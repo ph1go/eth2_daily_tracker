@@ -56,7 +56,7 @@ class Day:
     validators: Dict[str, ValidatorDc] = field(init=False, default_factory=dict)
 
 
-def update_price_and_balance_data(session, test=False):
+def update_price_and_balance_data(session, test=False, loop=False):
     current_eth_price = get_current_eth_price(test=test)
     current_validator_balances = get_validator_balances(test=test)
 
@@ -94,13 +94,17 @@ def update_price_and_balance_data(session, test=False):
             session.add(today_balance)
     
     log_str = (
-        f'{datetime.now().strftime("%Y/%m/%d %H:%M")}  Updated successfully (current price: {current_eth_price:,.2f} USD)'
+        f'{datetime.now().strftime("%Y/%m/%d %H:%M")}  '
+        f'Updated successfully (current ETH price: {current_eth_price:,.2f} USD)'
     )
             
     with log_file.open('a') as f:
         f.write(f'{log_str}\n')
-        
-    return log_str
+
+    if not loop:
+        print(f' {log_str}')
+
+    session.commit()
 
 
 def get_forex_data(date_range, currency):

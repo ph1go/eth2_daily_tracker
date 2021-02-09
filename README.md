@@ -11,10 +11,16 @@ Extract the files into their own folder and either install `sqlalchemy` and `req
 
 Modes of operation
 ==================
-`eth2_daily_tracker.py loop` or `eth2_daily_tracker.py l` - Update the saved data every x minutes (default: 5). Use this mode if you want to run the script in a terminal demultiplexer like tmux or screen.
+`eth2_daily_tracker.py update` or `eth2_daily_tracker.py u` - Update the saved data. 
+    
+Run with no args to update once and exit. 
+ 
+Run with `-l/--loop` to repeat every x (default: 5) minutes until stopped.
 
-`eth2_daily_tracker.py update` or `eth2_daily_tracker.py u` - Update the saved data once and then exit. Use this mode if you want to run the script via crontab or a task scheduler or just to run it from the command line.
+Run with `-s/--scheduled` if you want to run the script via crontab or a task scheduler.
 
+The two last modes (`-l/--loop` and `-s/--scheduled`) will restrict the Coinmarketcap API calls to 2 per hour so as to avoid hitting the soft limit, the Beaconcha.in API is called however often the script repeats so accurate balances will be shown. 
+ 
 `eth2_daily_tracker.py show` or `eth2_daily_tracker.py s` - Generate a report to display the saved data. The default period is the last week but you can alter this with `--date-from`/`--date-to` (to go for a historical range) args or `--since` (the number of days ago you want to start the range from).
 
 A log file, `updates.log`, is generated in the directory from which you are running the app - if you're running via crontab you can check this log file to make sure it's still updating.

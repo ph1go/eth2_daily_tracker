@@ -19,7 +19,7 @@ Run with `-l/--loop` to repeat every x (default: 5) minutes until stopped.
 
 Run with `-s/--scheduled` if you want to run the script via crontab or a task scheduler.
 
-The two last modes (`-l/--loop` and `-s/--scheduled`) will restrict the Coinmarketcap API calls to 2 per hour so as to avoid hitting the soft limit, the Beaconcha.in API is called however often the script repeats so accurate balances will be shown. 
+The two last modes (`-l/--loop` and `-s/--scheduled`) will restrict the Coinmarketcap API calls to 2 per hour (on the hour and at half past) so as to avoid hitting the soft limit, the Beaconcha.in API is called however often the script repeats so accurate balances will be shown. 
  
 `eth2_daily_tracker.py show` or `eth2_daily_tracker.py s` - Generate a report to display the saved data. The default period is the last week but you can alter this with `--date-from`/`--date-to` (to go for a historical range) args or `--since` (the number of days ago you want to start the range from).
 

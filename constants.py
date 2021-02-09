@@ -13,6 +13,9 @@ db_file = data_path / 'data.db'
 cmc_json_file = data_path / 'cmc_data.json'
 bc_json_file = data_path / 'bc_data.json'
 
+default_currency = 'USD'
+default_interval = 5
+
 
 def api_key_test(api_key):
     headers = {'Accepts': 'application/json', 'X-CMC_PRO_API_KEY': api_key}
@@ -89,7 +92,8 @@ if not config_file.is_file():
         exit()
 
     cfg['validator indexes']['validators'] = ', '.join(val_indexes)
-    cfg['options']['currency'] = 'USD'
+    cfg['options']['currency'] = default_currency
+    cfg['options']['interval in minutes'] = str(default_interval)
 
     with config_file.open('w') as f:
         cfg.write(f)
@@ -99,7 +103,9 @@ if not config_file.is_file():
 cfg.read(config_file)
 
 api_key = cfg['coinmarketcap api'].get('api key', fallback=None)
-currency = cfg['options'].get('currency', 'USD')
+currency = cfg.get('options', 'currency', fallback=default_currency)
+interval_in_minutes = cfg.getint('options', 'interval in minutes', fallback=default_interval)
+
 validator_indexes = [v.strip() for v in cfg['validator indexes'].get('validators').split(',')]
 
 if not api_key:

@@ -2,19 +2,20 @@
 
 import argparse
 import traceback
-from modes import mode_show, mode_loop, mode_update
+from modes import mode_show, mode_update
 from db import Session
+from constants import default_interval
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     subparsers = parser.add_subparsers()
-    parser_loop = subparsers.add_parser(
-        'loop', aliases=['l'], help=(
-            'update price and balance data until stopped, repeating every <interval> minutes - use this mode '
-            'if you want to run the application in a terminal demultiplexer (eg: screen or tmux)'
-        )
-    )
+    # parser_loop = subparsers.add_parser(
+    #     'loop', aliases=['l'], help=(
+    #         'update price and balance data until stopped, repeating every <interval> minutes - use this mode '
+    #         'if you want to run the application in a terminal demultiplexer (eg: screen or tmux)'
+    #     )
+    # )
 
     parser_update = subparsers.add_parser(
         'update', aliases=['u'], help=(
@@ -24,13 +25,29 @@ if __name__ == '__main__':
     )
 
     parser_update.add_argument(
+        '-l', '--loop', action='store_true',
+        help=(
+            'update price and balance data until stopped, repeating every <interval> minutes - use this mode '
+            'if you want to run the application in a terminal demultiplexer (eg: screen or tmux)'
+        )
+    )
+
+    parser_update.add_argument(
+        '-i', '--interval', action='store', type=int, default=default_interval,
+        help=(
+            f'when running with the -l/--loop argument, the time to wait in minutes between '
+            f'each update (default: {default_interval})'
+        )
+    )
+
+    parser_update.add_argument(
         '-t', '--test', action='store_true',
         help='use locally saved data instead of getting it fresh from the apis (saves api calls while testing)'
     )
 
-    parser_loop.add_argument(
-        '-i', '--interval', action='store', type=int, default=5,
-        help='the time to wait in minutes between updates (default: 5)'
+    parser_update.add_argument(
+        '-s', '--scheduled', action='store_true',
+        help='add this argument if you are running the script via crontab or a task scheduler'
     )
 
     parser_show = subparsers.add_parser('show', help='display price and balance data', aliases=['s'])
@@ -59,7 +76,7 @@ if __name__ == '__main__':
         '-d', '--detailed-view', action='store_true', help='show extra details (eg separate validator earnings)'
     )
 
-    parser_loop.set_defaults(func=mode_loop)
+    # parser_loop.set_defaults(func=mode_loop)
     parser_update.set_defaults(func=mode_update)
     parser_show.set_defaults(func=mode_show)
 

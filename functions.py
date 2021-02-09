@@ -77,9 +77,9 @@ class DayData:
         self.fiat_price_of_earned_str = f'{self.fiat_price_of_earned:,.2f} {fiat_currency}'
 
 
-def update_price_and_balance_data(session, test=False, loop=False):
-    current_eth_price = get_current_eth_price(test=test)
-    current_validator_balances = get_validator_balances(test=test)
+def update_price_and_balance_data(session, use_local_data=False, loop=False, run_as_task=False):
+    current_eth_price = get_current_eth_price(use_local_data=use_local_data, loop=loop, run_as_task=run_as_task)
+    current_validator_balances = get_validator_balances(use_local_data=use_local_data)
 
     today = date.today()
     yesterday = today - timedelta(days=1)
@@ -128,6 +128,51 @@ def update_price_and_balance_data(session, test=False, loop=False):
     session.commit()
 
 
+def get_current_eth_price(use_local_data=False, loop=False, run_as_task=False):
+    if (loop or run_as_task) and datetime.now().strftime('%M') not in ['00', '30']:
+        use_local_data = True
+
+    if use_local_data and cmc_json_file.is_file():
+        with cmc_json_file.open() as f:
+            cmc_data = json.load(f)
+
+    else:
+        if debug:
+            print(f' {time.strftime("%H:%M:%S")} downloading coinmarketcap data... ', end='', flush=True)
+            c_start = time.perf_counter()
+
+        url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest'
+        cmc_data = requests.get(url, headers=cmc_headers, params={'id': '1027'}).json()
+
+        with cmc_json_file.open('w') as f:
+            json.dump(cmc_data, f)
+
+    try:
+        return cmc_data['data']['1027']['quote']['USD']['price']
+
+    except Exception as e:
+        print(e)
+        return None
+
+
+def get_validator_balances(use_local_data=False):
+    if use_local_data and bc_json_file.is_file():
+        with bc_json_file.open() as f:
+            bc_response = json.load(f)
+
+    else:
+        url = f'https://beaconcha.in/api/v1/validator/{",".join(validator_indexes)}'
+        bc_response = requests.get(url).json()
+
+        with bc_json_file.open('w') as f:
+            json.dump(bc_response, f)
+
+    _ = bc_response['data']
+    data = _ if isinstance(_, list) else [_]
+
+    return {str(v['validatorindex']): v['balance'] for v in data}
+
+
 def get_forex_data(date_range, currency):
     start_date = min(date_range)
     if start_date.weekday() > 4:
@@ -169,7 +214,7 @@ def get_forex_data(date_range, currency):
     return data
 
 
-def get_price_and_balance_date(session, date_range):
+def get_price_and_balance_data(session, date_range):
     results = {}
     for date_ in date_range:
         date_price = session.query(Price).filter(Price.date == date_).first()
@@ -201,48 +246,6 @@ def check_date(in_date):
         print(f' Check date string "{in_date}"')
 
     return return_date
-
-
-def get_current_eth_price(test=False):
-    if test:
-        with cmc_json_file.open() as f:
-            cmc_data = json.load(f)
-
-    else:
-        if debug:
-            print(f' {time.strftime("%H:%M:%S")} downloading coinmarketcap data... ', end='', flush=True)
-            c_start = time.perf_counter()
-
-        url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest'
-        cmc_data = requests.get(url, headers=cmc_headers, params={'id': '1027'}).json()
-
-        with cmc_json_file.open('w') as f:
-            json.dump(cmc_data, f)
-
-    try:
-        return cmc_data['data']['1027']['quote']['USD']['price']
-
-    except Exception as e:
-        print(e)
-        return None
-
-
-def get_validator_balances(test=False):
-    if test:
-        with bc_json_file.open() as f:
-            bc_response = json.load(f)
-
-    else:
-        url = f'https://beaconcha.in/api/v1/validator/{",".join(validator_indexes)}'
-        bc_response = requests.get(url).json()
-
-        with bc_json_file.open('w') as f:
-            json.dump(bc_response, f)
-
-    _ = bc_response['data']
-    data = _ if isinstance(_, list) else [_]
-
-    return {str(v['validatorindex']): v['balance'] for v in data}
 
 
 def print_detailed_day(date_str, day_totals):

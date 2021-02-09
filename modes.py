@@ -1,26 +1,37 @@
 import time
 from datetime import datetime, date, timedelta
 from functions import (
-    update_price_and_balance_data, check_date, get_price_and_balance_date, get_forex_data,
+    update_price_and_balance_data, check_date, get_price_and_balance_data, get_forex_data,
     DayData, print_detailed_day, print_non_detailed_day
 )
 
 from constants import currency, validator_indexes
 
 
-def mode_loop(args, session):
-    while True:
-        try:
-            update_price_and_balance_data(session, loop=True)
-            print(f' {datetime.now().strftime("%H:%M:%S")}  Next update in {args.interval} minutes...')
-            time.sleep(args.interval * 60)
-
-        except KeyboardInterrupt:
-            break
+# def mode_loop(args, session):
+#     while True:
+#         try:
+#             update_price_and_balance_data(session, loop=True)
+#             print(f' {datetime.now().strftime("%H:%M:%S")}  Next update in {args.interval} minutes...')
+#             time.sleep(args.interval * 60)
+#
+#         except KeyboardInterrupt:
+#             break
 
 
 def mode_update(args, session):
-    update_price_and_balance_data(session, test=args.test)
+    if args.loop:
+        while True:
+            try:
+                update_price_and_balance_data(session, loop=True)
+                print(f' {datetime.now().strftime("%H:%M:%S")}  Next update in {args.interval} minutes...')
+                time.sleep(args.interval * 60)
+
+            except KeyboardInterrupt:
+                break
+
+    else:
+        update_price_and_balance_data(session, use_local_data=args.test, run_as_task=args.scheduled)
 
 
 def mode_show(args, session):
@@ -45,7 +56,7 @@ def mode_show(args, session):
 
     to_date = to_date + timedelta(days=1)
     date_range = [from_date + timedelta(days=x) for x in range((to_date - from_date).days)]
-    data_by_date = get_price_and_balance_date(session, date_range)
+    data_by_date = get_price_and_balance_data(session, date_range)
 
     more_than_1_validator = False
 
